@@ -7,7 +7,7 @@ include("const.jl")
 # typealias CCVDenseMatrix Ptr{Void}
 
 
-type CCVDenseMatrix
+type CCVDenseMatrix <: AbstractArray{Float64,2}
     dtype::Cint
     sig::UInt64
     refcount::Cint
@@ -17,6 +17,8 @@ type CCVDenseMatrix
     tag::Float64
     data::Ptr{Cdouble}
 end
+
+# CCVDenseMatrix() = CCVDenseMatrix(0, 0, 0, 0, 0, 0, 0., Ptr{}(0))
 
 "Use version without typ for now - only CCV_64F is supported"
 function CCVDenseMatrix(rows::Int, cols::Int, typ::UInt32)
@@ -30,6 +32,18 @@ CCVDenseMatrix(rows::Int, cols::Int) = CCVDenseMatrix(rows, cols, CCV_64F)
 
 function Base.show(io::IO, mat::CCVDenseMatrix)
     print(io, "CCVDenseMatrix($(mat.rows),$(mat.cols))")
+end
+
+function Base.getindex(mat::CCVDenseMatrix, i::Integer)
+    return unsafe_load(mat.data, i)
+end
+
+function Base.setindex!(mat::CCVDenseMatrix, i::Integer, v::Float64)
+    unsafe_store!(mat.data, i, v)
+end
+
+function Base.size(mat::CCVDenseMatrix)
+    return (Int(mat.rows), Int(mat.cols))
 end
 
 
@@ -60,7 +74,7 @@ end
 "Low-level function to create CCVDenseMatrix from Julia 1D array"
 function ccv_read{T}(data::Vector{T}, rows::Int, cols::Int)
     @assert rows*cols == length(data) "rows * cols != length of data!"
-    matptr = Array(Ptr{CCVDenseMatrix}, 1)
+    matptr = Array(Ptr{CCVDenseMatrix}, 1)    
     scanline = sizeof(T)
     typ = ccv_type(T) | CCV_IO_ANY_RAW
     code = ccall((:ccv_read_impl, libccv), Cint,
@@ -69,12 +83,12 @@ function ccv_read{T}(data::Vector{T}, rows::Int, cols::Int)
     if code != CCV_IO_FINAL
         throw(ErrorException("ccv_read_impl() exited with error: $code"))
     else
-        m = unsafe_load(matptr[1])
+        return unsafe_load(matptr[1])       
     end
 
 end
 
 function main()
-    path = Pkg.dir("CCV", "src", "goofy.png")
-    flags = CCV_IO_GRAY | CCV_IO_ANY_FILE
+    data = [1., 2, 3, 4, 5, 6]
+    mat = ccv_read(data, 3, 2)
 end
