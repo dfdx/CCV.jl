@@ -37,3 +37,10 @@ const CCV_IO_CONTINUE = 0x01
 const CCV_IO_ERROR = 0x02
 const CCV_IO_ATTEMPTED = 0x03
 const CCV_IO_UNKNOWN = 0x04
+
+
+const CCV_8U  = 0x01000
+const CCV_32S = 0x02000
+const CCV_32F = 0x04000
+const CCV_64S = 0x08000
+const CCV_64F = 0x10000
