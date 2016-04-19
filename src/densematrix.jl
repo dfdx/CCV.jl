@@ -128,5 +128,7 @@ function Base.convert{T}(::Type{CCVDenseMatrix}, arr::Array{T,2})
 end
 
 
+Base.cconvert{T}(::Type{Ptr{CCVDenseMatrixType{T}}}, mat::CCVDenseMatrix{T}) = mat
+Base.unsafe_convert{T}(::Type{Ptr{CCVDenseMatrixType{T}}}, mat::CCVDenseMatrix{T}) = mat.ptr
 
 

@@ -24,3 +24,6 @@ end
 immutable CCVArray
     ptr::Ptr{CCVArrayType}
 end
+
+
+# TODO: finalizer
