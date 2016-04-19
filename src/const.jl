@@ -44,3 +44,13 @@ const CCV_32S = 0x02000
 const CCV_32F = 0x04000
 const CCV_64S = 0x08000
 const CCV_64F = 0x10000
+
+
+const CCV2JULIA_TYPE =
+    Dict(CCV_8U => UInt8,
+         CCV_32S => Int32,
+         CCV_32F => Float32,
+         CCV_64S => Int64,
+         CCV_64F => Float64)
+
+const JULIA2CCV_TYPE = Dict(zip(values(CCV2JULIA_TYPE), keys(CCV2JULIA_TYPE)))
