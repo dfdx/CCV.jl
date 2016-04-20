@@ -30,4 +30,4 @@ ccv_io.o: ccv_io.c ccv.h ccv_internal.h io/*.c
 	$(CC) $< -o $@ -c $(CFLAGS) -fPIC
 
 %.o: %.cu ccv.h cuda/cwc.h cuda/cwc_internal.h cuda/cwc_helper.h
-	$(NVCC) $< -o $@ -c $(NVFLAGS) -fPIC
+	$(NVCC) $< -o $@ -c $(NVFLAGS) -Xcompiler -fPIC
