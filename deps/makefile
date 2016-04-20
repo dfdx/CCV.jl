@@ -4,6 +4,13 @@ include config.mk
 CFLAGS := -O3 -ffast-math -Wall $(CFLAGS)
 NVFLAGS := -O3 $(NVFLAGS)
 
+ifeq ($(HAVE_CUDA),)
+	NVSOFLAGS := -L$(CUDA_HOME)/lib64 -lcufft -lcublas -lcudart -lcuda -lrt
+else
+	NVSOFLAGS := 
+endif
+
+
 .PHONY: all clean
 
 all: libccv.a libccv.so ../samples/image-net-2012-vgg-d.sqlite3
@@ -15,7 +22,7 @@ libccv.a: ccv_cache.o ccv_memory.o 3rdparty/sha1/sha1.o 3rdparty/kissfft/kiss_ff
 	$(AR) rcs $@ $^
 
 libccv.so: ccv_cache.o ccv_memory.o 3rdparty/sha1/sha1.o 3rdparty/kissfft/kiss_fft.o 3rdparty/kissfft/kiss_fftnd.o 3rdparty/kissfft/kiss_fftr.o 3rdparty/kissfft/kiss_fftndr.o 3rdparty/kissfft/kissf_fft.o 3rdparty/kissfft/kissf_fftnd.o 3rdparty/kissfft/kissf_fftr.o 3rdparty/kissfft/kissf_fftndr.o 3rdparty/dsfmt/dSFMT.o 3rdparty/sfmt/SFMT.o 3rdparty/sqlite3/sqlite3.o ccv_io.o ccv_numeric.o ccv_algebra.o ccv_util.o ccv_basic.o ccv_image_processing.o ccv_resample.o ccv_transform.o ccv_classic.o ccv_daisy.o ccv_sift.o ccv_bbf.o ccv_mser.o ccv_swt.o ccv_dpm.o ccv_tld.o ccv_ferns.o ccv_icf.o ccv_scd.o ccv_convnet.o ccv_output.o $(CUDA_OBJS)
-	$(CC) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(NVSOFLAGS)
 
 ccv_io.o: ccv_io.c ccv.h ccv_internal.h io/*.c
 	$(CC) $< -o $@ -c $(CFLAGS) -fPIC
