@@ -7,20 +7,22 @@
     rows::Cint
     cols::Cint
     step::Cint
-    tag::Float64 # can actually be anything, but mapping to C requires this files to be 64 bits
+    tag::Float64 # can actually be anything, but mapping to C
+                 #  requires this field to be 64 bits
     data::Ptr{T}
 end
 
 
-@runonce immutable CCVDenseMatrix{T} <: AbstractArray{T,2}
-    ptr::Ptr{CCVDenseMatrixType{T}}    
+@runonce type CCVDenseMatrix{T} <: AbstractArray{T,2}
+    ptr::Ptr{CCVDenseMatrixType{T}}
+    function CCVDenseMatrix(ptr::Ptr{CCVDenseMatrixType{T}})
+        mat = new(ptr)
+        finalizer(mat, mat -> free(mat))
+        mat
+    end
 end
 
-function CCVDenseMatrix(ptr::Ptr{CCVDenseMatrixType})
-    mat = new(ptr)
-    finalizer(mat, mat -> free(mat))
-    mat
-end
+
 
 function CCVDenseMatrix(rows::Int, cols::Int, typ::UInt32)
     T = julia_type(typ)
@@ -32,7 +34,8 @@ end
 
 function free(mat::CCVDenseMatrix)
     if mat.ptr != C_NULL
-        ccall((:ccv_matrix_free, libccv), Void, (Ptr{CCVDenseMatrixType},), mat.ptr)
+        ccall((:ccv_matrix_free, libccv), Void,
+              (Ptr{CCVDenseMatrixType},), mat.ptr)
         mat.ptr = C_NULL
     end
 end
@@ -117,7 +120,7 @@ function from_vector{T}(data::Vector{T}, rows::Int, cols::Int)
         throw(ErrorException("ccv_read_impl() exited with error: $code"))
     else
         ptr = matout[]
-        return CCVDenseMatrix(ptr)
+        return CCVDenseMatrix{T}(ptr)
     end
 end
 

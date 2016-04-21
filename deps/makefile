@@ -4,7 +4,7 @@ include config.mk
 CFLAGS := -O3 -ffast-math -Wall $(CFLAGS)
 NVFLAGS := -O3 $(NVFLAGS)
 
-ifneq ($(HAVE_CUDA),)
+ifneq ($(CUDA_HOME),)
 	NVSOFLAGS := -L$(CUDA_HOME)/lib64 -lcufft -lcublas -lcudart -lcuda -lrt
 else
 	NVSOFLAGS := 
