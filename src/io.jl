@@ -27,12 +27,6 @@ if Pkg.installed("Images") != nothing
 
     using Images, Colors
     
-    function read_image(path::AbstractString)
-        img = load(path)
-        
-    end
-
-
     Base.convert{T}(::Type{Matrix{Float64}}, img::Image{Gray{T}}) =
         convert(Array{Float64, 2}, convert(Array, img))
 
@@ -42,7 +36,11 @@ if Pkg.installed("Images") != nothing
     Base.convert(::Type{Array{Float64, 3}}, img::Image) =
         convert(Array{Float64}, separate(img).data)
     
-    # rgb2arr(img) = convert(Array{Float64}, separate(img).data)
+    function CCVDenseMatrix(img::Image)
+        arr = convert(Matrix{Float64}, img)
+        return CCVDenseMatrix(arr)
+    end
+    
     
 end
 
