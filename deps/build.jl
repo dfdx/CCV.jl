@@ -1,9 +1,12 @@
 
-if !isdir("ccv")    
+if !isdir("ccv")
     run(`git clone https://github.com/liuliu/ccv`)
-    cd(joinpath("ccv", "lib"))
-    mv("makefile", "makefile.original") # we have our own
-    cp("../../makefile", "./makefile")
-    run(`./configure`)
-    run(`make`)
-end    
+end
+cd("ccv")
+run(`git pull`)
+cd("lib")
+mv("makefile", "makefile.original", remove_destination=true) # we have our own
+cp("../../makefile", "./makefile")
+run(`make clean`)
+run(`./configure`)
+run(`make`)
